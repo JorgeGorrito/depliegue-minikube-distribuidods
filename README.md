@@ -6,7 +6,7 @@
 <p>Para la instalacion de la aplicacion se debe correr el script de bash <strong>busroute.sh</strong></p>. Se debe de contar con <strong>minikube</strong> y <strong>kubectl</strong> para su correcta instalacion.</p>
 </br>
 <h2>Sobre la app</h2>
-<p>La app actualmente se encuentra en un entorno de pruebas, utilizar una base de datos de pruebas <strong>sqlite3</strong>. Cuenta con datos quemados de prueba.</p>
+<p>La app actualmente se encuentra en un entorno de pruebas, utilizar una base de datos de pruebas <strong>sqlite3</strong>. Cuenta con datos quemados de prueba. Para el administrador de la app se utiliza el admin de django que se encuentra en el backend user: admin, password: 123</p>
 <h3>Datos tecnicos</h3>
 <p>Para el disenno de la app se opto por usar <strong>Django</strong> como tecnologia para el front y back. Aunque django no es un framework especializado para el front se soporto gran parte de la funcionalidad en <strong>Js</strong>.</p>
 

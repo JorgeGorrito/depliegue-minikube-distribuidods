@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: back
-        image: jorgegorrito/busroutevillavicencioback:2.0
+        image: jorgegorrito/busroutevillavicencioback:6.0
         ports:
         - containerPort: 8000

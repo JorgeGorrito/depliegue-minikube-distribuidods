@@ -1,0 +1,149 @@
+{% extends 'map/base.html' %}
+{% block content %}
+<div id="map-container">{{map|safe}}</div>
+
+
+<script>
+    var iframeElement = document.getElementsByTagName('iframe')[0];
+    iframeElement.style.display = 'block';
+    iframeElement.style.height = '100vh';
+    var mapHtml = iframeElement.srcdoc;
+    var code = `
+        <script>
+            var InfoControl = L.Control.extend({
+
+            options: {
+                position: 'bottomright'
+            },
+
+            onAdd: function () {
+                var modal = L.DomUtil.create('div', 'alert alert-primary text-center');
+            modal.innerHTML = '<div class="d-flex align-items-center"><img src="https://cdn-icons-png.flaticon.com/512/416/416597.png" class="mr-2 mx-2" width="50" >' +
+                         '<h4><span id="bus-info"> ------ </span></h4></div>';
+
+            return modal;
+            }
+            });
+            
+            var InfoControl2 = L.Control.extend({
+
+            options: {
+                position: 'bottomleft'
+            },
+
+            onAdd: function () {
+            var modal = L.DomUtil.create('div', 'alert alert-primary text-center');
+            modal.innerHTML = '<div class="d-flex align-items-center"><img src="https://cdn-icons-png.flaticon.com/512/4797/4797269.png" class="mr-2 mx-2" width="52" >' +
+                         '<h4><span id="time-info">--:--:--</span></h4></div>';
+
+            return modal;
+            }
+            });
+
+            mimapa_8110.addControl(new InfoControl());
+            mimapa_8110.addControl(new InfoControl2());
+
+            function onMarkerClick(e) {
+            const marker = e.target;
+            const popup = marker.getPopup();
+            var nameBS = popup.getContent().innerHTML.split(':')[1].slice(1);
+            
+            var now = new Date();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var time = hour + ":" + minute + ":" + second;
+            var xhr = new XMLHttpRequest();
+            var url = "http://back-service:8000/routes/nextRoute/?hour=" + time + "&bus=" + nameBS;
+            xhr.open("GET", url);
+            xhr.send();
+            
+            xhr.onreadystatechange = function() {
+            
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                document.getElementById("time-info").innerHTML = response.hour;
+                document.getElementById("bus-info").innerHTML = response.name;
+            }
+            else if(xhr.status === 404)
+            {
+                document.getElementById("time-info").innerHTML = ' --:--:-- ';
+                document.getElementById("bus-info").innerHTML = ' ------ ';
+            }
+            };
+    
+        }
+
+        // Agregar el event listener a cada marcador
+        
+        mimapa_8110.eachLayer(
+            function(marker){
+            marker.addEventListener('click', onMarkerClick);
+        
+            //marker.getPopup().getContent().innerHTML+='<div id="message"></div>';
+            }
+        );
+        \x3C/script>
+    `;
+    iframeElement.srcdoc += code;
+   
+    function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position)=>{
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var code = `
+            <script>
+                function updateUserLocation()
+                {
+                    mimapa_8110.setView([${latitude}, ${longitude}], 16);
+                    if (typeof(userLocation)!=='undefined')
+                    {
+                        userLocation.setLatLng(L.latLng([${latitude}, ${longitude}]));
+                    } 
+                    else
+                    {   
+                        var userIcon = L.icon({'iconUrl': '{{icon_person_url}}','iconSize':[50,50]});
+                        var userLocation = L.marker([${latitude}, ${longitude}],{icon:userIcon}).addTo(mimapa_8110);
+                        userLocation.bindPopup('Estas aqui');
+                    }
+                }
+                updateUserLocation();
+            \x3C/script>
+                `;
+            iframeElement.srcdoc += code;
+            
+        });
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+    }
+    getLocation();
+    var code = `
+    <script>
+
+    var customControl = L.Control.extend({
+
+    options: {
+        position: 'topright'
+    },
+
+    onAdd: function () {
+    var button = L.DomUtil.create('button', 'custom-button');
+    button.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/819/819814.png" width="50px" alt="Custom Icon">';
+    button.addEventListener('click', function () {
+        updateUserLocation();
+    });
+    return button;
+  }
+});
+
+
+mimapa_8110.addControl(new customControl());
+
+    \x3C/script>
+    `;
+    iframeElement.srcdoc+=code;
+
+</script>
+{% endblock %}
