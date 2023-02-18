@@ -13,9 +13,10 @@ spec:
     metadata:
       labels:
         app: back
+        tier: backend
     spec:
       containers:
       - name: back
-        image: jorgegorrito/busroutevillavicencioback:1.0
+        image: jorgegorrito/busroutevillavicencioback:2.0
         ports:
         - containerPort: 8000

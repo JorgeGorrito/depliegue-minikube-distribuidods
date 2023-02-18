@@ -13,9 +13,10 @@ spec:
     metadata:
       labels:
         app: front
+        tier: frontend
     spec:
       containers:
       - name: front
-        image: jorgegorrito/busroutevillavicenciofront:2.0
+        image: jorgegorrito/busroutevillavicenciofront:3.0
         ports:
         - containerPort: 3000
